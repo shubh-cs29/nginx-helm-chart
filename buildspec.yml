@@ -32,6 +32,12 @@ phases:
       
   build:
     commands:
-      - docker build . -t $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION -f <PATH_TO_DOCKER_FILE> 
-      - kubectl get svc 
-      - kubectl apply -f nginx.yaml
+      - cd docker
+      - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com
+      - docker build -t web-application .
+      - docker tag web-application:$IMAGE_VERSION 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION
+      - docker push 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION
+
+  post_build: # kubernetes deployment
+    commands:
+      - "helm upgrade -i web-app ./web-app -f web-app/values.yaml --set image.repository=$IMAGE_REPO_URL --set image.tag=$IMAGE_VERSION --set replicaCount=4"
