@@ -33,8 +33,8 @@ phases:
   build:
     commands:
       - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com
-      - docker build . -t 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION -f docker/Dockerfile
-      - docker tag 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION
+      - docker build . -t web-application:$IMAGE_VERSION -f docker/Dockerfile
+      - docker tag web-application:$IMAGE_VERSION 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION
       - docker push 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION
 
   post_build: # kubernetes deployment
