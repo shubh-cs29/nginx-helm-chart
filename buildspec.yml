@@ -40,4 +40,6 @@ phases:
 
   post_build: # kubernetes deployment
     commands:
+      - cat ~/.kube/config
+      - kubectl get svc --namespace kube-system
       - "helm upgrade -i web-app ./web-app -f web-app/values.yaml --set image.repository=$IMAGE_REPO_URL --set image.tag=$IMAGE_VERSION --set replicaCount=4"
