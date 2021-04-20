@@ -34,13 +34,15 @@ phases:
     commands:
       - cd docker
       - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com
-      - docker build -t web-application:$IMAGE_VERSION .
-      - docker tag web-application:$IMAGE_VERSION 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION
+      - docker build -t 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION .
+      - docker tag 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION
       - docker push 739521814962.dkr.ecr.ap-southeast-1.amazonaws.com/web-application:$IMAGE_VERSION
-      - cd ..
 
   post_build: # kubernetes deployment
     commands:
       - cat ~/.kube/config
+      - cd ..
+      - pwd
+      - ls -lrt
       - kubectl get svc --namespace kube-system
       - "helm upgrade -i web-app ./web-app -f web-app/values.yaml --set image.repository=$IMAGE_REPO_URL --set image.tag=$IMAGE_VERSION --set replicaCount=4"
