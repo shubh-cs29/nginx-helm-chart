@@ -8,9 +8,9 @@ phases:
     commands:
       - apt-get install zip -y
       - apt-get install jq -y
-      #- curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      #- unzip awscliv2.zip
-      #- ./aws/install
+#       - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+#       - unzip awscliv2.zip
+#       - ./aws/install
       - ls -lrt
       - aws sts get-caller-identity
       - aws --version
@@ -22,11 +22,16 @@ phases:
       - curl -o /opt/kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.7/2020-07-08/bin/linux/amd64/kubectl
       - chmod +x /opt/kubectl
       - mv /opt/kubectl /usr/bin
-      - cp kubeconfig /opt/kubeconfig
-      - export KUBECONFIG=/opt/kubeconfig
+      - curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+      - chmod 700 get_helm.sh
+      - ./get_helm.sh
       
-        
+  pre_build: # Add kubeconfig to access to EKS cluster
+    commands:
+      - aws eks --region ap-southeast-1 update-kubeconfig --name wordpress-eks-cluster
+      
   build:
     commands:
+      - docker build . -t $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION -f <PATH_TO_DOCKER_FILE> 
       - kubectl get svc 
       - kubectl apply -f nginx.yaml
